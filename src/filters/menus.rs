@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use serde_json::value::Value;
 use tera::{Result};
-use crate::caches::menus::{MENUS};
+use crate::caches::menus::{MAIN_MENUS};
 
 /// 得到菜单名称
 pub fn menu_name<'r, 's>(val: &'r Value, _data: &'s HashMap<String, Value>) -> Result<Value> { 
@@ -10,7 +10,7 @@ pub fn menu_name<'r, 's>(val: &'r Value, _data: &'s HashMap<String, Value>) -> R
         if id == 0 { 
             return Ok(json!(""));
         }
-        let menus = &*MENUS;
+        let menus = &*MAIN_MENUS.lock().unwrap();
         if let Some(v) = menus.get(&id) { 
             return Ok(json!(v));
         }
