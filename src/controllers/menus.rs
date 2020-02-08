@@ -19,4 +19,8 @@ impl Controller for Menus {
     fn save_after() { 
         menus::refresh(); //刷新菜单缓存
     }
+
+    fn delete_after() {
+        menus::refresh();
+    }
 }

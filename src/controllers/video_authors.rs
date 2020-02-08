@@ -15,4 +15,8 @@ impl Controller for VideoAuthors {
     fn save_after() { 
         video_authors::refresh();
     }
+
+    fn delete_after() { 
+        video_authors::refresh();
+    }
 }

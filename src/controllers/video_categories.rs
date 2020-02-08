@@ -15,4 +15,8 @@ impl Controller for VideoCategories {
     fn save_after() { 
         video_categories::refresh();
     }
+
+    fn delete_after() { 
+        video_categories::refresh();
+    }
 }

@@ -20,4 +20,8 @@ impl Controller for AdminRoles {
     fn save_after() { 
         admin_roles::refresh(); //刷新缓存
     }
+
+    fn delete_after() { 
+        admin_roles::refresh();
+    }
 }

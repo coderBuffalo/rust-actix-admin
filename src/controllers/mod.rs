@@ -244,8 +244,14 @@ pub trait Controller {
         ];
         let mut conn = db::get_conn();
         let affected_rows = Self::M::delete(&mut conn, &cond);
-        if affected_rows == 0 { response::error("未删除任何记录") } else { response::ok() }
+        if affected_rows == 0 { response::error("未删除任何记录") } else { 
+            Self::delete_after();
+            response::ok() 
+        }
     }
+
+    /// 删除之后处理
+    fn delete_after() { }
 }
 
 pub mod index;

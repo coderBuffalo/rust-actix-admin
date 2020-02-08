@@ -32,7 +32,6 @@ pub fn allow_access(role_id: usize, url: &str) -> bool {
         return false;
     }
     let role_menus = &*ROLE_MENUS.lock().unwrap();
-    //let urls = url.split("|").collect::<Vec<&str>>();
     if let Some(menus) = role_menus.get(&role_id) { 
         for menu in menus { 
             for sub in &menu.menus { 
@@ -59,7 +58,6 @@ fn refresh_roles() {
     ];
     let mut roles = ADMIN_ROLES.lock().unwrap();
     (*roles).clear();
-    //let mut roles = HashMap::new();
     let rs = AdminRoles::fetch_rows(&mut conn, &query, None);
     for r in rs { 
         let (id, name): (usize, String) = from_row!(r);

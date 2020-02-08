@@ -15,4 +15,8 @@ impl Controller for VideoTags {
     fn save_after() { 
         video_tags::refresh();
     }
-}
+
+    fn delete_after() { 
+        video_tags::refresh();
+    }
+}   
