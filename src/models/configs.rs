@@ -34,9 +34,9 @@ impl ModelBackend for Configs {
         Validator::load(&data)
             .string_length("site_name", "分类名称必须在2-20之间", 2, 20, true)
             .string_length("site_url", "链接地址不能为空", 1, 200, true)
-            .string_limit("seo_keyword", "备注长度不能超过200", 200)
-            .string_limit("seo_desc", "备注长度不能超过200", 200)
-            .string_limit("copyright", "备注长度不能超过200", 200)
+            .string_limit("seo_keyword", "SEO说明长度不能超过200", 200)
+            .string_limit("seo_desc", "SEO描述长度不能超过200", 200)
+            .string_limit("copyright", "版权信息长度不能超过200", 200)
             .validate()
     }
 }
