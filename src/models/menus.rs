@@ -14,6 +14,7 @@ pub struct Menus {
     pub is_blank: u32, //是否新窗口
     pub url: String, //链接地址
     pub seq: isize, //排序
+    pub is_show: u32, //是否显示
 }
 
 #[derive(Default, Debug, Serialize)]
@@ -48,6 +49,7 @@ impl ModelBackend for Menus {
         is_blank => u32,
         url => String,
         seq => isize,
+        is_show => u32,
     ]);
 
     fn validate(data: &HashMap<String, String>) -> Result<(), String> { 
