@@ -4,7 +4,7 @@
     <label for="parent_id" class="layui-form-label"> <span class="x-red">*</span>上级菜单: </label>
     <div class="layui-input-inline">
         <select name="parent_id" lay-verify="required">
-            <option value="0">无上线菜单</option>
+            <option value="0">无上级菜单</option>
             {% for key, value in menus -%}
             <option value="{{key}}" {% if row.parent_id == value %}selected="selected"{% endif %}>{{value}}</option>
             {% endfor -%}
