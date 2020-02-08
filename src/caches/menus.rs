@@ -4,10 +4,12 @@ use fluffy::{db, model::Model};
 use crate::models::Menus;
 
 lazy_static! {
+    /// 顶级菜单
     pub static ref MAIN_MENUS: Mutex<HashMap<usize, String>> = { Mutex::new(get_cache_items()) };
 }
 
 lazy_static! { 
+    /// 所有菜单信息 - 主要用于处理面包屑
     pub static ref BREADS: Mutex<HashMap<String, String>> = { Mutex::new(get_cache_breads()) };
 }
 
@@ -24,7 +26,7 @@ pub fn refresh() {
 fn get_cache_items() -> HashMap<usize, String> { 
     let fields = "id, name";
     let mut conn = db::get_conn();
-    let cond = cond!["parent_id" => &"0", "is_show" => &"1",];
+    let cond = cond!["parent_id" => &"0", "is_show" => &"1", "state" => &"1",];
     let query = query![fields => &fields,];
     let rs = Menus::fetch_rows(&mut conn, &query, Some(&cond));
     let mut menus = HashMap::new();
