@@ -96,7 +96,7 @@ pub trait Controller {
         let cond = if query_cond.len() > 0 { Some(&query_cond) } else { None };
         let controller_name = Self::get_controller_name(); //控制器名称
         let info = Self::M::get_records(&request, cond);
-        let breads = &*caches::menus::BREADS;
+        let breads = &*caches::menus::BREADS.lock().unwrap();
         let bread_path = if let Some(v) = breads.get(&format!("/{}", controller_name)) { v } else { "" };
         let mut data = tmpl_data![
             "action_name" => &"index",
