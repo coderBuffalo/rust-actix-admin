@@ -27,6 +27,7 @@
 {{ form::yes_no(name="is_blank", title="是否外链", value=row.is_blank) }}
 {{ form::seq(value=row.seq) }}
 {{ form::state(name="state", title="状态", value=row.state) }}
+{{ form::yes_no(name="is_show", title="是否显示", value=row.is_show) }}
 <script>
 layui.validators = { 
     name: function(value) { 
