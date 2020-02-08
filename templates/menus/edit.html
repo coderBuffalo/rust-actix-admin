@@ -4,6 +4,7 @@
     <label for="parent_id" class="layui-form-label"> <span class="x-red">*</span>上级菜单: </label>
     <div class="layui-input-inline">
         <select name="parent_id" lay-verify="required">
+            <option value="0">无上线菜单</option>
             {% for key, value in menus -%}
             <option value="{{key}}" {% if row.parent_id == value %}selected="selected"{% endif %}>{{value}}</option>
             {% endfor -%}
@@ -29,8 +30,18 @@
 <script>
 layui.validators = { 
     name: function(value) { 
-        if (value.length < 5) { 
-            return '昵称至少5个字符';
+        if (value.length < 2 || value.length > 20) { 
+            return '必须输入正确的菜单名称';
+        }
+    },
+    url: function(value) { 
+        if (value == "") { 
+            return '路由地址不能为空';
+        }
+    },
+    seq: function(value) { 
+        if (isNaN(value)) { 
+            return '排序必须是有效的数字';
         }
     }
 };
