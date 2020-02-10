@@ -9,8 +9,23 @@
 <script>
 layui.validators = { 
     name: function(value) { 
-        if (value.length < 5) { 
-            return '昵称至少5个字符';
+        if (value.length < 2 || value.length > 20) { 
+            return '导航名称长度应为2-20之间';
+        }
+    },
+    url: function(value) { 
+        if (/^\s*$/.test(value) || value.length > 200) { 
+            return '外链地址有误';
+        }
+    },
+    remark: function(value) { 
+        if (value.length > 200) { 
+            return '备注长度不能超过20个字符';
+        }
+    },
+    seq: function(value) { 
+        if (isNaN(value)) { 
+            return '排序必须是有效的数字';
         }
     }
 };
