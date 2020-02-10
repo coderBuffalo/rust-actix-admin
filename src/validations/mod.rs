@@ -156,7 +156,8 @@ impl<'a> Validator<'a> {
     /// 指定长度的字符串
     pub fn string_length(&mut self, field: &'static str, message: &'static str, min: usize, max: usize, is_required: bool) -> &mut Self { 
         if let Some(v) = self.data.get(field) { 
-            if v.len() < min || v.len() > max {
+            let word_count = v.chars().count();
+            if word_count < min || word_count > max {
                 self.errors.push(message);
             }
         } else if is_required { 
