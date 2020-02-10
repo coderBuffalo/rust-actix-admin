@@ -165,3 +165,5 @@ INSERT INTO menus (parent_id, name, level_id, state, url, is_show) VALUES
 (@parent_id, '视频作者删除', 1, 1, '/video_authors/delete/\\d+', 0);
 set @last_id = LAST_INSERT_ID();
 UPDATE admin_roles SET menu_ids = concat(menu_ids, ',', @last_id) WHERE id = 1;
+
+ALTER TABLE videos ADD COLUMN is_recommended TINYINT NOT NULL DEFAULT 0 COMMENT '是否推荐';
