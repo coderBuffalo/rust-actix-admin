@@ -24,7 +24,7 @@ Tera: https://tera.netlify.com/docs/
 ## 二次开发 & 技术交流
 #### QQ群: 1036231916
 #### 微信加群: 
-![avatar](/public/wx.jpg)
+![avatar](/public/wx.png)
 
 
 ## 环境要求
