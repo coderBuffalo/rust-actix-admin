@@ -84,11 +84,7 @@ vim nginx.conf #修改相应的域名、目录、代理地址、端口
 #### 运行程序
 
 ```bash
-cargo run
-```
-或者
-```bash
-cargo run --release
+cargo run #生产模式: cargo run --release
 ```
 
 ## 捐助支持
