@@ -68,6 +68,17 @@ FLUSH PRIVILEGES;
 USE rust_admin; 
 /* 导入初始化数据库(请依据实际路径) */
 SOURCE scripts/init.sql; 
+
+/** 以下非必须, 只有前端使用 rust-vlog 时才会用到 **/
+/* 创建vlog示例数据库 */
+CREATE DATABASE rust_vlog DEFAULT CHARSET=UTF8 COLLATE=UTF8_GENERAL_CI; 
+/* 设置vlog用户名称密码 */
+GRANT ALL PRIVILEGES ON `rust_vlog`.* to 'rust_vlog'@'%' IDENTIFIED BY 'rust-x-lsl'; 
+FLUSH PRIVILEGES;
+/* 选中vlog数据库 */
+USE rust_vlog; 
+/* 导入初始化vlog数据库(请依据实际路径) */
+SOURCE scripts/example-vlog.sql;
 ```
 
 ***** * 默认用户/名称: admin / qwe123
