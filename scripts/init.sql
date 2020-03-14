@@ -155,7 +155,7 @@ CREATE TABLE `menus` (
   `seq` int(11) NOT NULL DEFAULT '0' COMMENT '排序',
   PRIMARY KEY (`id`),
   KEY `parent_id` (`parent_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=45 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=48 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -275,7 +275,7 @@ CREATE TABLE `video_authors` (
   `remark` varchar(500) DEFAULT '' COMMENT '备注',
   `seq` int(11) NOT NULL DEFAULT '0' COMMENT '排序',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -284,7 +284,7 @@ CREATE TABLE `video_authors` (
 
 LOCK TABLES `video_authors` WRITE;
 /*!40000 ALTER TABLE `video_authors` DISABLE KEYS */;
-INSERT INTO `video_authors` VALUES (1,'默认','默认',0),(2,'唐司令说电影','B站: https://space.bilibili.com/98605231?from=search&seid=7447429227219220401\r\n爱奇艺: https://www.iqiyi.com/u/2322942463/videos',0),(3,'科幻梦工场','用心讲好每一个科幻故事！\r\nB站: https://space.bilibili.com/108425972/',0),(4,'越哥说电影','宇哥只做好看的电影，保留最精华部分，用诙谐幽默的解说娓娓道来，用心为大家奉献有笑料有态度的影视解说。',0);
+INSERT INTO `video_authors` VALUES (1,'默认','默认',0),(2,'唐司令说电影','B站: https://space.bilibili.com/98605231?from=search&seid=7447429227219220401\r\n爱奇艺: https://www.iqiyi.com/u/2322942463/videos',0),(3,'科幻梦工场','用心讲好每一个科幻故事！\r\nB站: https://space.bilibili.com/108425972/',0),(4,'越哥说电影','宇哥只做好看的电影，保留最精华部分，用诙谐幽默的解说娓娓道来，用心为大家奉献有笑料有态度的影视解说。',0),(5,'大聪看电影','从文字撰稿，到剪辑，到发布，都由大聪一人完成。\r\n不追求跑量，只研磨精品。\r\n你们的支持，就是大聪最好的原创动力！',0),(6,'看电影了没','好的电影，改变你的认知 。断更的视频，请订阅频道：补更看电影了没。',0);
 /*!40000 ALTER TABLE `video_authors` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -393,8 +393,9 @@ CREATE TABLE `videos` (
   `tag_ids` varchar(500) NOT NULL DEFAULT '' COMMENT '标签编号',
   `author_id` int(10) unsigned DEFAULT '0' COMMENT '作者编号',
   `url` varchar(200) NOT NULL DEFAULT '' COMMENT '观影地址',
+  `is_recommended` tinyint(4) NOT NULL DEFAULT '0' COMMENT '是否推荐',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -403,7 +404,7 @@ CREATE TABLE `videos` (
 
 LOCK TABLES `videos` WRITE;
 /*!40000 ALTER TABLE `videos` DISABLE KEYS */;
-INSERT INTO `videos` VALUES (1,'深海之战','科学家发现一种可燃怪鱼，便开始进行改造，结果创造了恐怖的怪物！','/upload/2020/02/05/YpbyOTgJHeYP836D.png',210,0,1,1580976010,1580976010,'贫民窟小伙逆袭带领大军攻破世界头号游戏公司,迎娶白富美',2,'1,10,7',2,'http://ww.aomc.com'),(2,'流感','一个小小的感冒要死了韩国几十万人','/upload/2020/02/05/YS9XXOcBiToBG5Fp.png',0,0,1,1580969911,1580969911,'asdfasdf',2,'1,19,27,7',2,'');
+INSERT INTO `videos` VALUES (1,'深海之战','科学家发现一种可燃怪鱼，便开始进行改造，结果创造了恐怖的怪物！','/upload/2020/02/05/YpbyOTgJHeYP836D.png',210,0,1,1581335253,1581335253,'贫民窟小伙逆袭带领大军攻破世界头号游戏公司,迎娶白富美',2,'1,10,7',2,'https://www.youtube.com/watch?v=C5IAlShJhhg',1),(2,'流感','一个小小的感冒要死了韩国几十万人','/upload/2020/02/05/YS9XXOcBiToBG5Fp.png',0,0,1,1581335233,1581335233,'asdfasdf',2,'1,19,27,7',2,'https://www.youtube.com/watch?v=aLsplmkS0Vo',1),(3,'猛禽小隊：小丑女大解放','深度彩蛋解析！老娘就是酷！DC宇宙再扳回一局！','/upload/2020/02/10/bks5628jC2bRVUWQ.png',0,0,1,1581335259,1581335259,NULL,2,'1,10,11',5,'https://www.youtube.com/watch?v=4s9hJSloiP4',1),(4,'朱迪','2020奥斯卡电影：找个爱我的人，有多难？','/upload/2020/02/10/J7zZKxBEKSv32xPI.png',0,0,1,1581335264,1581335264,NULL,2,'1,10,26',5,'https://www.youtube.com/watch?v=-oPGx4XNqzo',1),(5,'爱有来生','死后，我等了你50年，俞飞鸿10年处女作','/upload/2020/02/10/Nxlqt4u1rlxh17Wi.png',0,0,1,1581335270,1581335270,NULL,2,'1,10',6,'https://www.youtube.com/watch?v=q9jUkDBLY2w',1),(6,'推拿','盲人推拿室里，无处安放的情与欲','/upload/2020/02/10/gtqqYecbHRwV0j5U.png',0,0,1,1581335275,1581335275,NULL,2,'1,10,11,13',6,'https://www.youtube.com/watch?v=H90E2mP5W5E',1),(7,'依然爱丽丝','确诊后的日子，每一天都是慢性死亡','/upload/2020/02/10/lJGIZW5NkuW0dmbW.png',0,0,1,1581335280,1581335280,NULL,2,'10,11,14,15,18,21',6,'https://www.youtube.com/watch?v=_tQHXp9H-L0',1),(8,'浪潮','一个恐怖的人性实验，真实改编','/upload/2020/02/10/5zpnVyd5g4axS02f.png',0,0,1,1581335286,1581335286,NULL,2,'1,10,11,12,2',6,'https://www.youtube.com/watch?v=vKpLJx1cpds',1),(9,'父辈的旗帜','二战期间，这里成了太平洋绞肉机','/upload/2020/02/10/KjsmhNBD78fUjWhH.png',0,0,1,1581335291,1581335291,NULL,2,'1,10,11,12,15,16',6,'https://www.youtube.com/watch?v=P3qxq0ebH8c',1),(10,'八月：奥色治郡','有一个刻薄的母亲，是种什么体验？','/upload/2020/02/10/GNtRBxrziAhl8T7A.png',0,0,1,1581335296,1581335296,NULL,2,'1,13,17,20',6,'https://www.youtube.com/watch?v=ZwZWDewDsP4',1),(11,'最后的莫西干人','欧洲黑历史，印第安人是怎么消失的？','/upload/2020/02/10/HbqCaFgKEpggORTb.png',0,0,1,1581334731,0,NULL,2,'13,14,17,18,25',6,'https://www.youtube.com/watch?v=69veiSnIfVk',0),(12,'荆轲刺秦王','秦始皇为什么要活埋赵国的孩子？','/upload/2020/02/10/RFA04Q35POWEi5rX.png',0,0,0,1581334791,0,NULL,2,'17,20,24,28',6,'https://www.youtube.com/watch?v=Ovp3zw7PHJU',0);
 /*!40000 ALTER TABLE `videos` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -445,4 +446,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-02-08 14:09:56
+-- Dump completed on 2020-02-10 20:00:14
