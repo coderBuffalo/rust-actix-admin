@@ -23,7 +23,7 @@ Tera: https://tera.netlify.com/docs/
 
 ## 二次开发 & 技术交流
 #### QQ群: 1036231916
-#### 微信加群: 
+#### 微信群, 扫码备注: rust 加入
 ![avatar](/public/wx.png)
 
 
