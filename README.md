@@ -6,7 +6,7 @@ rust-admin 2.0 简介:
 
 2. 后端使用 Actix-Web 2.0
 
-3. UI使用付费授权版的layui-pro 进行周整优化, 
+3. UI使用付费授权版的layui-pro 进行周整优化 (感谢网友Taro热心支持, 感谢社区)
 
 4. 数据库调整为 postgresql
 
