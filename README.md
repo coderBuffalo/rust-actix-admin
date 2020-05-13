@@ -1,8 +1,16 @@
-***<span style="color: red">注意: </span> 全栈式 rust-admin 2.0 正在开发当中, 此1.0版本只进行安全维护, 如果有问题可以加微信/QQ群进一步沟通 
+<span style="color: red">注意:  全栈式 rust-admin 2.0 正在开发当中, 此1.0版本只进行安全维护, 如果有问题可以加微信/QQ群进一步沟通 </span>
 
-rust-admin 2.0 采用 前端Yew + 后端Actix-Web 进行全栈式开发, 并使用付费授权版的layui-pro 进行UI优化, 预计6月上线基本可用版本，静请期待。
+rust-admin 2.0 简介: 
 
-感谢大家支持!!!
+1. 前端使用 Yew 框架
+
+2. 后端使用 Actix-Web 2.0
+
+3. UI使用付费授权版的layui-pro 进行周整优化, 
+
+4. 数据库调整为 postgresql
+
+预计6月上线基本可用版本，静请期待。感谢大家支持!!!
 
 
 # 基于Rust的后台管理系统
