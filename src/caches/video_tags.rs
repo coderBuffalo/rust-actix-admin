@@ -4,6 +4,7 @@ use fluffy::{db, model::Model};
 use crate::models::{VideoTags};
 
 lazy_static! { 
+    /// 对全部标签分类进行缓存
     pub static ref VIDEO_TAGS: Mutex<HashMap<usize, String>> = { 
         let rows = get_cache_items();
         Mutex::new(rows)
