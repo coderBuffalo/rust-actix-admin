@@ -23,6 +23,7 @@ pub fn refresh() {
     *breads = get_cache_breads();
 }
 
+/// 得到缓存项
 fn get_cache_items() -> HashMap<usize, String> { 
     let fields = "id, name";
     let mut conn = db::get_conn();
@@ -37,6 +38,7 @@ fn get_cache_items() -> HashMap<usize, String> {
     menus
 }
 
+// 得到缓存-面包屑
 fn get_cache_breads() -> HashMap<String, String> { 
     let menus = Menus::get_related();
     let mut breads: HashMap<String, String> = HashMap::new();
