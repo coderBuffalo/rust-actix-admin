@@ -4,6 +4,7 @@ use fluffy::{db, model::Model};
 use crate::models::{VideoAuthors};
 
 lazy_static! { 
+    /// 对全部视频作者进行缓存
     pub static ref VIDEO_AUTHORS: Mutex<HashMap<usize, String>> = { 
         let rows = get_cache_items();
         Mutex::new(rows)
