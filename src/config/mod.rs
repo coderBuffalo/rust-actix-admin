@@ -70,7 +70,7 @@ pub struct Setting {
 }
 
 lazy_static! { 
-    pub static ref SETTING: Setting = { get_setting_from_toml!(Setting) };
+    pub static ref SETTING: Setting = get_setting_from_toml!(Setting);
     //pub static ref DB_INFO: Database = { dbg!(get_setting_from_toml!(Database)) };
     //pub static ref APP_INFO: App = { get_setting_from_toml!(App) };
     //pub static ref OSS_INFO: OSS = { get_setting_from_toml!(OSS) };
