@@ -5,12 +5,12 @@ use crate::models::Menus;
 
 lazy_static! {
     /// 顶级菜单
-    pub static ref MAIN_MENUS: Mutex<HashMap<usize, String>> = { Mutex::new(get_cache_items()) };
+    pub static ref MAIN_MENUS: Mutex<HashMap<usize, String>> = Mutex::new(get_cache_items());
 }
 
 lazy_static! { 
     /// 所有菜单信息 - 主要用于处理面包屑
-    pub static ref BREADS: Mutex<HashMap<String, String>> = { Mutex::new(get_cache_breads()) };
+    pub static ref BREADS: Mutex<HashMap<String, String>> = Mutex::new(get_cache_breads());
 }
 
 /// 缓存刷新
