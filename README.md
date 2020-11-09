@@ -1,18 +1,20 @@
-<span style="color: red">注意:  全栈式 rust-admin 2.0 正在开发当中, 此1.0版本只进行安全维护, 如果有问题可以加微信/QQ群进一步沟通 </span>
+<span style="color: red">注意:  全栈式 rust-admin 2.0 正在开发当中, 当前版本只进行维护, 请加微信群沟通 </span>
 
 rust-admin 2.0 简介: 
 
-1. 前端使用 Yew 框架
+1. 前端使用 Yew/WASM 框架开发
 
-2. 后端使用 Actix-Web 2.0
+2. 后端使用 Actix-Web 3.x
 
-3. UI使用付费授权版的layui-pro 进行调整优化 (感谢网友Taro热心支持, 感谢社区)
+3. UI使用付费授权版的layui 进行调整优化 (感谢网友Taro热心支持, 感谢社区)
 
-4. 数据库调整为 postgresql, 连接池管理使用sqlx, 数据库调优, 使用存储过程、触发器、视图
+4. 数据库调整为 postgresql, 连接池管理使用sqlx, 数据库调优
 
 5. 前后端分离、数据传输加密
 
-预计6月上线基本可用版本，静请期待。感谢大家支持!!!
+6. 先天支持分布式部署
+
+静请期待。感谢大家支持!!!
 
 
 # 基于Rust的后台管理系统
@@ -32,15 +34,14 @@ Actix框架: https://actix.rs/
 
 #### MVC 设计模式,快速入门,方便上手。
 
-#### Tera 模板引擎,layout、elements等简化开发。 
+#### Tera 模板引擎, layout、elements 等概念简化开发。 
 
 Tera: https://tera.netlify.com/docs/
 
-#### 基于Rust语言特性,有性能、安全保证,先天优于Go/Java/.Net/Php等带GC语言。
+#### 基于Rust语言特性,有性能、安全保证
 
 ## 二次开发 & 技术交流
-#### QQ群: 1036231916
-#### 微信群, 扫码备注: rust 加入
+#### 微信群, 扫码备注: 'rust', 否则不会通过
 ![avatar](/public/wx.png)
 
 
@@ -76,26 +77,28 @@ cd rust-admin
 #### 创建数据库(Mysql)并入导入数据
 
 ```sql
-/* 创建数据库 */
-CREATE DATABASE rust_admin DEFAULT CHARSET=UTF8 COLLATE=UTF8_GENERAL_CI; 
-/* 设置用户名称密码 */
-GRANT ALL PRIVILEGES ON `rust_admin`.* to 'rust_admin'@'%' IDENTIFIED BY 'rust-x-lsl'; 
+CREATE DATABASE rust_admin -- 创建数据库
+    DEFAULT CHARSET=UTF8 
+    COLLATE=UTF8_GENERAL_CI; 
+GRANT ALL PRIVILEGES -- 设置用户名称密码
+    ON `rust_admin`.* 
+    TO 'rust_admin'@'%' 
+    IDENTIFIED BY 'rust-x-lsl'; 
 FLUSH PRIVILEGES;
-/* 选中数据库 */
-USE rust_admin; 
-/* 导入初始化数据库(请依据实际路径) */
-SOURCE scripts/init.sql; 
+USE rust_admin; -- 选中数据库
+SOURCE scripts/init.sql; -- 导入初始化数据库(请依据实际路径)
 
-/** 以下非必须, 只有前端使用 rust-vlog 时才会用到 **/
-/* 创建vlog示例数据库 */
-CREATE DATABASE rust_vlog DEFAULT CHARSET=UTF8 COLLATE=UTF8_GENERAL_CI; 
-/* 设置vlog用户名称密码 */
-GRANT ALL PRIVILEGES ON `rust_vlog`.* to 'rust_vlog'@'%' IDENTIFIED BY 'rust-x-lsl'; 
+-- 以下非必须, 只有前端使用 rust-vlog 时才会用到
+CREATE DATABASE rust_vlog -- 创建vlog示例数据库
+    DEFAULT CHARSET=UTF8 
+    COLLATE=UTF8_GENERAL_CI; 
+GRANT ALL PRIVILEGES -- 设置vlog用户名称密码
+    ON `rust_vlog`.* 
+    TO 'rust_vlog'@'%' 
+    IDENTIFIED BY 'rust-x-lsl'; 
 FLUSH PRIVILEGES;
-/* 选中vlog数据库 */
-USE rust_vlog; 
-/* 导入初始化vlog数据库(请依据实际路径) */
-SOURCE scripts/example-vlog.sql;
+USE rust_vlog; -- 选中vlog数据库
+SOURCE scripts/example-vlog.sql; -- 导入初始化vlog数据库(请依据实际路径)
 ```
 
 ***** * 默认用户/名称: admin / qwe123
@@ -115,8 +118,3 @@ vim nginx.conf #修改相应的域名、目录、代理地址、端口
 cargo run #生产模式: cargo run --release
 ```
 
-## 捐助支持
-
-欢迎各位朋友互相交流, 共同推进rust在中国的发展, 感谢支持:
-
-![avatar](/public/static/images/wx.png) ![avatar](/public/static/images/tb.png)
