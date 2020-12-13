@@ -42,7 +42,7 @@ Tera: https://tera.netlify.com/docs/
 
 ## 二次开发 & 技术交流
 #### 微信群, 扫码备注: 'rust', 否则不会通过
-![avatar](/public/wx.png)
+![avatar](/public/wx.jpeg)
 
 
 ## 环境要求
