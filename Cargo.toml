@@ -36,7 +36,7 @@ futures = "0.3"
 percent-encoding = "2.1"
 
 [dependencies.fluffy]
-git = "https://github.com/houhanting/fluffy.git" 
+git = "https://gitee.com/houhanting/fluffy.git"
 branch = "master"
 #release模式请去掉以下debug
 features = ["debug"]
