@@ -41,7 +41,7 @@ impl ModelBackend for Admins {
     fn save_before(data: &mut HashMap<String, String>) { 
         if let Some(v) = data.get("password") {  //如果提交的有密码
             let secret = random::rand_str(32);
-            let password = utils::get_password(&secret, v);
+            let password = utils::get_password(v, &secret);
             data.insert("password".to_owned(), password);
             data.insert("secret".to_owned(), secret);
         }
