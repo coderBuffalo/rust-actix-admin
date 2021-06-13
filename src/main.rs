@@ -12,9 +12,8 @@ use fluffy::db;
 use std::time::{Duration, Instant};
 
 use actix::*;
-use actix_web::{web, App, Error, HttpRequest, HttpResponse, HttpServer, middleware};
+use actix_web::{middleware, web, App, Error, HttpRequest, HttpResponse, HttpServer};
 use actix_web_actors::ws;
-
 
 mod caches;
 mod common;
@@ -22,16 +21,10 @@ mod config;
 mod controllers;
 mod filters;
 mod models;
-mod validations;
 mod server;
+mod validations;
 
-use controllers::{
-    admin_roles::AdminRoles, admins::Admins, ads::Ads, configs::Configs, index::Index,
-    menus::Menus, navs::Navs, user_levels::UserLevels, users::Users, video_authors::VideoAuthors,
-    video_categories::VideoCategories, video_replies::VideoReplies, video_tags::VideoTags,
-    videos::Videos, watch_records::WatchRecords, Controller,
-};
-
+use controllers::routes;
 
 /// How often heartbeat pings are sent
 const HEARTBEAT_INTERVAL: Duration = Duration::from_secs(5);
@@ -120,11 +113,7 @@ impl Handler<server::Message> for WsChatSession {
 
 /// WebSocket message handler
 impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsChatSession {
-    fn handle(
-        &mut self,
-        msg: Result<ws::Message, ws::ProtocolError>,
-        ctx: &mut Self::Context,
-    ) {
+    fn handle(&mut self, msg: Result<ws::Message, ws::ProtocolError>, ctx: &mut Self::Context) {
         let msg = match msg {
             Err(_) => {
                 ctx.stop();
@@ -279,93 +268,10 @@ async fn main() -> std::io::Result<()> {
             .wrap(middleware::Logger::default()) //正式环境可以注释此行 ***
             .service(Files::new("/static", "public/static/")) //静态文件目录
             .service(Files::new("/upload", "public/upload/")) //上传文件目录
-            .service(web::resource("/test").to(Index::test))
-            .service(get!("/", Index::index))
-            .service(post!("/index/login", Index::login))
-            .service(get!("/index/manage", Index::manage))
-            .service(get!("/index/right", Index::right))
-            .service(get!("/index/right", Index::right))
-            .service(get!("/index/error", Index::error))
-            .service(get!("/index/logout", Index::logout))
-            .service(get!("/index/change_pwd", Index::change_pwd))
-            .service(post!("/index/change_pwd_save", Index::change_pwd_save))
-            .service(get!("/index/oss_signed_url", Index::oss_signed_url))
-            .service(post!("/index/upload", Index::upload_images))
-            //后台用户
-            .service(get!("/admins", Admins::index))
-            .service(get!("/admins/edit/{id}", Admins::edit))
-            .service(post!("/admins/save/{id}", Admins::save))
-            .service(get!("/admins/delete/{ids}", Admins::delete))
-            //角色管理
-            .service(get!("/admin_roles", AdminRoles::index))
-            .service(get!("/admin_roles/edit/{id}", AdminRoles::edit))
-            .service(post!("/admin_roles/save/{id}", AdminRoles::save))
-            .service(get!("/admin_roles/delete/{ids}", AdminRoles::delete))
-            //菜单管理
-            .service(get!("/menus", Menus::index))
-            .service(get!("/menus/edit/{id}", Menus::edit))
-            .service(post!("/menus/save/{id}", Menus::save))
-            .service(get!("/menus/delete/{ids}", Menus::delete))
-            //前台用户
-            .service(get!("/users", Users::index))
-            .service(get!("/users/edit/{id}", Users::edit))
-            .service(post!("/users/save/{id}", Users::save))
-            .service(get!("/users/delete/{ids}", Users::delete))
-            //视频分类
-            .service(get!("/video_categories", VideoCategories::index))
-            .service(get!("/video_categories/edit/{id}", VideoCategories::edit))
-            .service(post!("/video_categories/save/{id}", VideoCategories::save))
-            .service(get!(
-                "/video_categories/delete/{ids}",
-                VideoCategories::delete
-            ))
-            //视频管理
-            .service(get!("/videos", Videos::index))
-            .service(get!("/videos/edit/{id}", Videos::edit))
-            .service(post!("/videos/save/{id}", Videos::save))
-            .service(get!("/videos/delete/{ids}", Videos::delete))
-            //视频标签
-            .service(get!("/video_tags", VideoTags::index))
-            .service(get!("/video_tags/edit/{id}", VideoTags::edit))
-            .service(post!("/video_tags/save/{id}", VideoTags::save))
-            .service(get!("/video_tags/delete/{ids}", VideoTags::delete))
-            //视频作者
-            .service(get!("/video_authors", VideoAuthors::index))
-            .service(get!("/video_authors/edit/{id}", VideoAuthors::edit))
-            .service(post!("/video_authors/save/{id}", VideoAuthors::save))
-            .service(get!("/video_authors/delete/{ids}", VideoAuthors::delete))
-            //用户等级
-            .service(get!("/user_levels", UserLevels::index))
-            .service(get!("/user_levels/edit/{id}", UserLevels::edit))
-            .service(get!("/user_levels/delete/{ids}", UserLevels::delete))
-            .service(post!("/user_levels/save/{id}", UserLevels::save))
-            //观看记录
-            .service(get!("/watch_records", WatchRecords::index))
-            .service(get!("/watch_records/edit/{id}", WatchRecords::edit))
-            .service(get!("/watch_records/delete/{ids}", WatchRecords::delete))
-            .service(post!("/watch_records/save/{id}", WatchRecords::save))
-            //replies
-            .service(get!("/video_replies", VideoReplies::index))
-            .service(get!("/video_replies/edit/{id}", VideoReplies::edit))
-            .service(post!("/video_replies/save/{id}", VideoReplies::save))
-            .service(get!("/video_replies/delete/{ids}", VideoReplies::delete))
-            //广告管理
-            .service(get!("/ads", Ads::index))
-            .service(get!("/ads/edit/{id}", Ads::edit))
-            .service(post!("/ads/save/{id}", Ads::save))
-            .service(get!("/ads/delete/{ids}", Ads::delete))
-            //网站导航
-            .service(get!("/navs", Navs::index))
-            .service(get!("/navs/edit/{id}", Navs::edit))
-            .service(post!("/navs/save/{id}", Navs::save))
-            .service(get!("/navs/delete/{ids}", Navs::delete))
-            //网站设置
-            .service(get!("/configs/edit/{id}", Configs::edit))
-            .service(post!("/configs/save/{id}", Configs::save))
-//            .service(web::resource("/ws/").route(web::get().to(websocket::ws_index)))
             .service(web::resource("/ws/").to(chat_route))
+            .configure(routes)
     })
-        .bind(host_port)?
-        .run()
-        .await
+    .bind(host_port)?
+    .run()
+    .await
 }

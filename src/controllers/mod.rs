@@ -1,72 +1,115 @@
+use crate::caches;
+use crate::common::Acl;
+use crate::models::ModelBackend;
+use actix_session::Session;
+use actix_web::{
+    web::{self, Form, Path},
+    HttpRequest, HttpResponse,
+};
+use fluffy::{
+    cond_builder::CondBuilder, data_set::DataSet, datetime, db, model::Db, model::Model, response,
+    tmpl::Tpl,
+};
+use percent_encoding::percent_decode;
+use serde::ser::Serialize;
 use std::collections::HashMap;
 use std::fmt::Debug;
-use fluffy::{ tmpl::Tpl, response, model::Model, model::Db, data_set::DataSet, db, cond_builder::CondBuilder, datetime};
-use crate::models::ModelBackend;
-use actix_web::{HttpResponse, web::{Path, Form}, HttpRequest};
-use crate::caches;
-use serde::ser::{Serialize};
-use actix_session::{Session};
-use crate::common::Acl;
-use percent_encoding::{percent_decode};
 
-pub trait Controller { 
-    
+pub trait Controller {
     /// 模型
     type M: ModelBackend + Default + Serialize + Debug;
-    
+
     /// 得到控制器名称
-    fn get_controller_name() -> &'static str { 
+    fn get_controller_name() -> &'static str {
         Self::M::get_table_name()
     }
-    
+
     /// 得到查询条件
-    fn get_query_cond() -> Vec<(&'static str, &'static str)> { vec![] }
+    fn get_query_cond() -> Vec<(&'static str, &'static str)> {
+        vec![]
+    }
 
     /// 得到最终查询条件
-    fn get_cond(queries: &HashMap<&str, &str>) -> CondBuilder { 
+    fn get_cond(queries: &HashMap<&str, &str>) -> CondBuilder {
         let mut cond = CondBuilder::new();
         let conditions = Self::get_query_cond();
-        for c in &conditions { 
+        for c in &conditions {
             let field = c.0;
             let sign = c.1;
             if let Some(value) = queries.get(field) {
                 let value_bytes = value.trim().as_bytes();
-                let real_value = if let Ok(v) = percent_decode(value_bytes).decode_utf8() { v } else { continue; };
-                if real_value == "" { 
+                let real_value = if let Ok(v) = percent_decode(value_bytes).decode_utf8() {
+                    v
+                } else {
+                    continue;
+                };
+                if real_value == "" {
                     continue;
                 }
-                match sign { 
-                    "=" => { cond.eq(field, &real_value); },
-                    "!=" => { cond.ne(field, &real_value); },
-                    ">" => { cond.gt(field, &real_value); },
-                    ">=" => { cond.gte(field, &real_value); },
-                    "<" => { cond.lt(field, &real_value); },
-                    "<=" => { cond.lte(field, &real_value); },
-                    "%" => { cond.like(field, &real_value); },
-                    _ => { }
+                match sign {
+                    "=" => {
+                        cond.eq(field, &real_value);
+                    }
+                    "!=" => {
+                        cond.ne(field, &real_value);
+                    }
+                    ">" => {
+                        cond.gt(field, &real_value);
+                    }
+                    ">=" => {
+                        cond.gte(field, &real_value);
+                    }
+                    "<" => {
+                        cond.lt(field, &real_value);
+                    }
+                    "<=" => {
+                        cond.lte(field, &real_value);
+                    }
+                    "%" => {
+                        cond.like(field, &real_value);
+                    }
+                    _ => {}
                 };
             }
-            if sign == "[]" {  //数字区间
+            if sign == "[]" {
+                //数字区间
                 let key1 = format!("{}_start", field);
-                let value1 = if let Some(v) = queries.get(key1.as_str()) { v.trim() }  else { continue; };
+                let value1 = if let Some(v) = queries.get(key1.as_str()) {
+                    v.trim()
+                } else {
+                    continue;
+                };
                 let key2 = format!("{}_end", field);
-                let value2 = if let Some(v) = queries.get(key2.as_str()) { v.trim() } else { continue; };
-                if value1 == "" || value2 == "" { 
+                let value2 = if let Some(v) = queries.get(key2.as_str()) {
+                    v.trim()
+                } else {
+                    continue;
+                };
+                if value1 == "" || value2 == "" {
                     continue;
                 }
                 cond.between(field, &value1, &value2);
             }
-            if sign == "[date]" {  //日期区间
+            if sign == "[date]" {
+                //日期区间
                 let key1 = format!("{}_start", field);
-                let value1 = if let Some(v) = queries.get(key1.as_str()) { v.trim() } else { "" };
-                if value1 != "" { 
+                let value1 = if let Some(v) = queries.get(key1.as_str()) {
+                    v.trim()
+                } else {
+                    ""
+                };
+                if value1 != "" {
                     let date_str = format!("{} 00:00:00", value1);
                     let timestamp = datetime::from_str(date_str.as_str()).timestamp();
                     cond.gt(field, &timestamp);
                 }
                 let key2 = format!("{}_end", field);
-                let value2 = if let Some(v) = queries.get(key2.as_str()) { v.trim() } else { "" };
-                if value2 != "" { 
+                let value2 = if let Some(v) = queries.get(key2.as_str()) {
+                    v.trim()
+                } else {
+                    ""
+                };
+                if value2 != "" {
                     let date_str = format!("{} 00:00:00", value2);
                     let timestamp = datetime::from_str(date_str.as_str()).timestamp();
                     cond.lte(field, &timestamp);
@@ -76,23 +119,31 @@ pub trait Controller {
 
         cond
     }
-    
+
     /// 处理额外的追回数据
     fn index_after(_data: &mut tera::Context) {}
-    
+
     /// 主頁
-    fn index(request: HttpRequest, session:Session, tpl: Tpl) -> HttpResponse { 
-        if !Acl::check_login(&session) || !Acl::check_auth(&request, &session) { 
+    fn index(request: HttpRequest, session: Session, tpl: Tpl) -> HttpResponse {
+        if !Acl::check_login(&session) || !Acl::check_auth(&request, &session) {
             return response::redirect("/index/error");
         }
         let query_string = request.query_string();
         let queries = fluffy::request::get_queries(query_string);
         let query_cond = Self::get_cond(&queries);
-        let cond = if query_cond.len() > 0 { Some(&query_cond) } else { None };
+        let cond = if query_cond.len() > 0 {
+            Some(&query_cond)
+        } else {
+            None
+        };
         let controller_name = Self::get_controller_name(); //控制器名称
         let info = Self::M::get_records(&request, cond);
         let breads = &*caches::menus::BREADS.lock().unwrap();
-        let bread_path = if let Some(v) = breads.get(&format!("/{}", controller_name)) { v } else { "" };
+        let bread_path = if let Some(v) = breads.get(&format!("/{}", controller_name)) {
+            v
+        } else {
+            ""
+        };
         let mut data = tmpl_data![
             "action_name" => &"index",
             "controller_name" => &controller_name,
@@ -101,7 +152,7 @@ pub trait Controller {
             "bread_path" => &bread_path,
         ];
         let conds = Self::get_query_cond();
-        for (key, sign) in &conds { 
+        for (key, sign) in &conds {
             if sign == &"[]" || sign == &"[date]" {
                 let key1 = format!("{}_start", key);
                 let value1 = queries.get(key1.as_str()).unwrap_or(&"");
@@ -113,13 +164,17 @@ pub trait Controller {
             }
             let value = queries.get(key).unwrap_or(&"");
             //if NUMBERS.is_match(value) {  //如果是数字, 则转换成数字
-            //    if let Ok(n) = dbg!(value.parse::<usize>()) { 
+            //    if let Ok(n) = dbg!(value.parse::<usize>()) {
             //        data.insert(key.to_owned(), &n);
             //        continue;
-            //    } 
+            //    }
             //}
             let value_bytes = value.as_bytes();
-            let real_value = if let Ok(v) = percent_decode(value_bytes).decode_utf8() { v } else { continue; };
+            let real_value = if let Ok(v) = percent_decode(value_bytes).decode_utf8() {
+                v
+            } else {
+                continue;
+            };
             data.insert(key.to_owned(), &real_value);
         }
         Self::index_after(&mut data);
@@ -131,21 +186,25 @@ pub trait Controller {
     fn edit_after(_data: &mut tera::Context) {}
 
     /// 編輯
-    fn edit(request: HttpRequest, session: Session, info: Path<usize>, tpl: Tpl) -> HttpResponse { 
-        if !Acl::check_login(&session) || !Acl::check_auth(&request, &session) { 
+    fn edit(request: HttpRequest, session: Session, info: Path<usize>, tpl: Tpl) -> HttpResponse {
+        if !Acl::check_login(&session) || !Acl::check_auth(&request, &session) {
             return response::redirect("/index/error");
         }
         let controller_name = Self::get_controller_name(); //控制器名称
         let id = info.into_inner();
         let is_update = id > 0;
-        let row = if !is_update { Self::M::get_default() } else { 
+        let row = if !is_update {
+            Self::M::get_default()
+        } else {
             let fields = Self::M::get_fields();
             let query = query![fields => &fields, ];
             let cond = cond!["id" => id,];
             let mut conn = fluffy::db::get_conn();
-            if let Some(r) = Self::M::fetch_row(&mut conn, &query, Some(&cond)) { 
+            if let Some(r) = Self::M::fetch_row(&mut conn, &query, Some(&cond)) {
                 Self::M::get_record(r)
-            } else { Self::M::get_default() }
+            } else {
+                Self::M::get_default()
+            }
         };
         let mut data = tmpl_data![
             "controller_name" => controller_name,
@@ -158,18 +217,28 @@ pub trait Controller {
     }
 
     /// 編輯
-    fn save(request: HttpRequest, session: Session, info: Path<usize>, post: Form<HashMap<String, String>>) -> HttpResponse { 
-        if !Acl::check_login(&session) || !Acl::check_auth(&request, &session) { 
+    fn save(
+        request: HttpRequest,
+        session: Session,
+        info: Path<usize>,
+        post: Form<HashMap<String, String>>,
+    ) -> HttpResponse {
+        if !Acl::check_login(&session) || !Acl::check_auth(&request, &session) {
             return response::error("拒绝访问, 未授权");
         }
         let id = info.into_inner();
-        if id == 0 { Self::save_for_create(post) } else { Self::save_for_update(id, post) }
+        if id == 0 {
+            Self::save_for_create(post)
+        } else {
+            Self::save_for_update(id, post)
+        }
     }
 
     /// 添加
-    fn save_for_create(post: Form<HashMap<String, String>>) -> HttpResponse { 
+    fn save_for_create(post: Form<HashMap<String, String>>) -> HttpResponse {
         let post_fields = post.into_inner();
-        if let Err(message) = Self::M::validate(&post_fields) {  //如果检验出错
+        if let Err(message) = Self::M::validate(&post_fields) {
+            //如果检验出错
             return response::error(message);
         }
         let table_name = Self::M::get_table_name();
@@ -177,22 +246,23 @@ pub trait Controller {
         let mut checked_fields = Db::check_fields(table_name, &table_fields, post_fields, false); //經過檢驗之後的數據
         Self::M::save_before(&mut checked_fields); //对于保存数据前的检测
         let mut data = DataSet::create();
-        for (k, v) in &checked_fields { 
+        for (k, v) in &checked_fields {
             data.set(k, &v.trim());
         }
         let mut conn = db::get_conn();
         let id = Self::M::create(&mut conn, &data);
-        if id > 0 { 
+        if id > 0 {
             Self::save_after();
             return response::ok();
-        } 
+        }
         response::error("增加記錄失敗")
     }
-    
+
     /// 修改
-    fn save_for_update(id: usize, post: Form<HashMap<String, String>>) -> HttpResponse { 
+    fn save_for_update(id: usize, post: Form<HashMap<String, String>>) -> HttpResponse {
         let post_fields = post.into_inner();
-        if let Err(message) = Self::M::validate(&post_fields) {  //如果检验出错
+        if let Err(message) = Self::M::validate(&post_fields) {
+            //如果检验出错
             return response::error(message);
         }
         let table_name = Self::M::get_table_name();
@@ -200,8 +270,9 @@ pub trait Controller {
         let mut checked_fields = Db::check_fields(table_name, &table_fields, post_fields, true); //經過檢驗之後的數據
         Self::M::save_before(&mut checked_fields); //对于保存数据前的检测
         let mut data = DataSet::update();
-        for (k, v) in &checked_fields { 
-            if k == "id" {  //跳过id字段
+        for (k, v) in &checked_fields {
+            if k == "id" {
+                //跳过id字段
                 continue;
             }
             data.set(k, &v.trim());
@@ -209,25 +280,29 @@ pub trait Controller {
         let mut conn = db::get_conn();
         let cond = cond![ "id" => &id, ];
         let id = Self::M::update(&mut conn, &data, &cond);
-        if id > 0 { 
+        if id > 0 {
             Self::save_after();
             return response::ok();
-        } 
+        }
         response::error("修改記錄失敗")
     }
 
     /// 保存之后处理
-    fn save_after() { }
-    
+    fn save_after() {}
+
     /// 刪除
-    fn delete(request: HttpRequest, session: Session, id_strings: Path<String>) -> HttpResponse { 
-        if !Acl::check_login(&session) || !Acl::check_auth(&request, &session) { 
+    fn delete(request: HttpRequest, session: Session, id_strings: Path<String>) -> HttpResponse {
+        if !Acl::check_login(&session) || !Acl::check_auth(&request, &session) {
             return response::error("拒绝访问, 未授权");
         }
         let mut ids_string = String::new();
-        for (index, value) in id_strings.split(",").enumerate() { 
-            let _ = if let Ok(v) = value.parse::<usize>() { v } else { return response::error("错误的参数"); };
-            if index > 0 { 
+        for (index, value) in id_strings.split(",").enumerate() {
+            let _ = if let Ok(v) = value.parse::<usize>() {
+                v
+            } else {
+                return response::error("错误的参数");
+            };
+            if index > 0 {
                 ids_string.push_str(",");
             }
             ids_string.push_str(value);
@@ -237,28 +312,134 @@ pub trait Controller {
         ];
         let mut conn = db::get_conn();
         let affected_rows = Self::M::delete(&mut conn, &cond);
-        if affected_rows == 0 { response::error("未删除任何记录") } else { 
+        if affected_rows == 0 {
+            response::error("未删除任何记录")
+        } else {
             Self::delete_after();
-            response::ok() 
+            response::ok()
         }
     }
 
     /// 删除之后处理
-    fn delete_after() { }
+    fn delete_after() {}
 }
 
-pub mod index;
-pub mod admins;
-pub mod admin_roles;
-pub mod menus;
-pub mod users;
-pub mod video_categories;
-pub mod videos;
-pub mod video_replies;
-pub mod video_tags;
-pub mod user_levels;
-pub mod watch_records;
-pub mod ads;
-pub mod navs;
-pub mod configs;
-pub mod video_authors;
+mod admin_roles;
+mod admins;
+mod ads;
+mod configs;
+mod index;
+mod menus;
+mod navs;
+mod user_levels;
+mod users;
+mod video_authors;
+mod video_categories;
+mod video_replies;
+mod video_tags;
+mod videos;
+mod watch_records;
+
+use admin_roles::AdminRoles;
+use admins::Admins;
+use ads::Ads;
+use configs::Configs;
+use index::Index;
+use menus::Menus;
+use navs::Navs;
+use user_levels::UserLevels;
+use users::Users;
+use video_authors::VideoAuthors;
+use video_categories::VideoCategories;
+use video_replies::VideoReplies;
+use video_tags::VideoTags;
+use videos::Videos;
+use watch_records::WatchRecords;
+
+pub fn routes(cfg: &mut web::ServiceConfig) {
+    cfg.service(web::resource("/test").to(Index::test))
+        .service(get!("/", Index::index))
+        .service(
+            web::scope("/index")
+                .service(post!("/login", Index::login))
+                .service(get!("/manage", Index::manage))
+                .service(get!("/right", Index::right))
+                .service(get!("/error", Index::error))
+                .service(get!("/logout", Index::logout))
+                .service(get!("/change_pwd", Index::change_pwd))
+                .service(post!("/change_pwd_save", Index::change_pwd_save))
+                .service(get!("/oss_signed_url", Index::oss_signed_url))
+                .service(post!("/upload", Index::upload_images)),
+        )
+        //后台用户
+        .service(get!("/admins", Admins::index))
+        .service(get!("/admins/edit/{id}", Admins::edit))
+        .service(post!("/admins/save/{id}", Admins::save))
+        .service(get!("/admins/delete/{ids}", Admins::delete))
+        //角色管理
+        .service(get!("/admin_roles", AdminRoles::index))
+        .service(get!("/admin_roles/edit/{id}", AdminRoles::edit))
+        .service(post!("/admin_roles/save/{id}", AdminRoles::save))
+        .service(get!("/admin_roles/delete/{ids}", AdminRoles::delete))
+        //菜单管理
+        .service(get!("/menus", Menus::index))
+        .service(get!("/menus/edit/{id}", Menus::edit))
+        .service(post!("/menus/save/{id}", Menus::save))
+        .service(get!("/menus/delete/{ids}", Menus::delete))
+        //前台用户
+        .service(get!("/users", Users::index))
+        .service(get!("/users/edit/{id}", Users::edit))
+        .service(post!("/users/save/{id}", Users::save))
+        .service(get!("/users/delete/{ids}", Users::delete))
+        //视频分类
+        .service(get!("/video_categories", VideoCategories::index))
+        .service(get!("/video_categories/edit/{id}", VideoCategories::edit))
+        .service(post!("/video_categories/save/{id}", VideoCategories::save))
+        .service(get!(
+            "/video_categories/delete/{ids}",
+            VideoCategories::delete
+        ))
+        //视频管理
+        .service(get!("/videos", Videos::index))
+        .service(get!("/videos/edit/{id}", Videos::edit))
+        .service(post!("/videos/save/{id}", Videos::save))
+        .service(get!("/videos/delete/{ids}", Videos::delete))
+        //视频标签
+        .service(get!("/video_tags", VideoTags::index))
+        .service(get!("/video_tags/edit/{id}", VideoTags::edit))
+        .service(post!("/video_tags/save/{id}", VideoTags::save))
+        .service(get!("/video_tags/delete/{ids}", VideoTags::delete))
+        //视频作者
+        .service(get!("/video_authors", VideoAuthors::index))
+        .service(get!("/video_authors/edit/{id}", VideoAuthors::edit))
+        .service(post!("/video_authors/save/{id}", VideoAuthors::save))
+        .service(get!("/video_authors/delete/{ids}", VideoAuthors::delete))
+        //用户等级
+        .service(get!("/user_levels", UserLevels::index))
+        .service(get!("/user_levels/edit/{id}", UserLevels::edit))
+        .service(get!("/user_levels/delete/{ids}", UserLevels::delete))
+        .service(post!("/user_levels/save/{id}", UserLevels::save))
+        //观看记录
+        .service(get!("/watch_records", WatchRecords::index))
+        .service(get!("/watch_records/edit/{id}", WatchRecords::edit))
+        .service(get!("/watch_records/delete/{ids}", WatchRecords::delete))
+        .service(post!("/watch_records/save/{id}", WatchRecords::save))
+        //replies
+        .service(get!("/video_replies", VideoReplies::index))
+        .service(get!("/video_replies/edit/{id}", VideoReplies::edit))
+        .service(post!("/video_replies/save/{id}", VideoReplies::save))
+        .service(get!("/video_replies/delete/{ids}", VideoReplies::delete))
+        //广告管理
+        .service(get!("/ads", Ads::index))
+        .service(get!("/ads/edit/{id}", Ads::edit))
+        .service(post!("/ads/save/{id}", Ads::save))
+        .service(get!("/ads/delete/{ids}", Ads::delete))
+        //网站导航
+        .service(get!("/navs", Navs::index))
+        .service(get!("/navs/edit/{id}", Navs::edit))
+        .service(post!("/navs/save/{id}", Navs::save))
+        .service(get!("/navs/delete/{ids}", Navs::delete))
+        //网站设置
+        .service(get!("/configs/edit/{id}", Configs::edit))
+        .service(post!("/configs/save/{id}", Configs::save));
+}
